@@ -7,43 +7,35 @@ def solve(file_name):
         part_1_result = 0
         part_2_result = 0
         for line in file.readlines():
-            report = [int(item) for item in line.split()]
-            print(report)           
-            part_1_result += check_report(report, False, (report[1] - report[0] < 0), True)
-            part_2_result += check_report(report, True,  (report[1] - report[0] < 0), True)
-#            if check_report(report, True,  (report[1] - report[0] < 0), True):
-#                print(report)
+            report = [int(item) for item in line.split()]        
+            part_1_result += check_report(report, 0, False, (report[1] - report[0] < 0))
+            part_2_result += check_report(report, 0, True,  (report[1] - report[0] < 0))
+
         print(part_1_result)
         print(part_2_result)
 
-def check_report(report, can_dump, dir, start):
-    if len(report) == 2:
-        return True
+def check_report(report, i,  can_dump, dir):
+    if i == len(report)-1:
+        return 1 #in the end
     else:
-        if report[2 - start] - report[1 - start] in valid[dir]:
-            return check_report(report[1 - start:], can_dump, dir, False)
-        
-        elif can_dump:
-            if (start and check_report(report[1:], False, (report[2]-report[1] < 0), False)):
+        if report[i+1] - report[i] in valid[dir]:
+            return check_report(report, i+1, can_dump, dir) #Next step
+                 
+        elif can_dump: #dumping cases
+
+            if (i <= 1 and check_report(report[1:], 0, False, (report[2]-report[1] < 0))):
+                print(report)
                 return 1
             
-            if len(report) == 3:
+            if check_report(report[:i]+report[i+1:], i-1, False, dir if i > 1 else (report[i+1] - report[i-1] < 0)):
+                print(report)
                 return 1
             
-            
-            new_report = report.copy()
-            new_report.pop(1)
-            if check_report(new_report, False, dir, True):
+            if check_report(report[:i+1]+report[i+2:], i, False, dir):
+                print(report)
                 return 1
             
-            new_report = report.copy()
-            new_report.pop(2)
-            if check_report(new_report, False, dir, False):
-                return 1
-            
-            return 0
-        else:
-            return 0
+        return 0
     
         
 
@@ -55,32 +47,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-def solve_part_1(file_name):
-    with open(file_name, 'r') as file:
-        result = 0
-        for line in file.readlines():
-            report = [int(item) for item in line.split()]
-            result += check_report(report, False)
-        print(result)
-
-def solve_part_2(file_name):
-    with open(file_name, 'r') as file:
-        result = 0
-        for line in file.readlines():
-            report = [int(item) for item in line.split()]
-            #print(report)
-            if check_report(report) :
-                result += 1
-            else:
-                #print('removing')
-                for i in range(len(report)):
-                    new_array = report.copy()
-                    new_array.pop(i)
-                    #print(new_array)
-                    if check_report(new_array):
-                        result += 1
-                        break
-                #print('end removing')
-
-        print(result)
