@@ -28,6 +28,7 @@ def solve_part_1(file_name):
                 result_2 += fix_update(rules, update)
         print(result_1)
         print(result_2)
+
 def fix_update(rules, update):
     do_again = True
     while (do_again):
@@ -38,7 +39,6 @@ def fix_update(rules, update):
                     if rule in update and id > update.index(rule):
                         do_again = True
                         update[id], update[update.index(rule)] = update[update.index(rule)], update[id]
-                        #return 0
     #print(update)
     return update[len(update)//2]
     # return 1
