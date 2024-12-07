@@ -10,13 +10,15 @@ def solve(file_name):
             target = int(target)
             inputs = [int(i) for i in inputs.split()]
 
-            result += target if dfs(target, inputs[0], inputs[1:], False) else 0
-            result2 += target if dfs(target, inputs[0], inputs[1:], True) else 0
+            result  += target if dfs(target, inputs[0], inputs[1:], False) else 0
+            result2 += target if dfs(target, inputs[0], inputs[1:], True)  else 0
             
         print(f'Part 1 {result} \nPart 2 {result2}')
 
 def dfs(result, current_result, inputs, part2):
-    if inputs == []:
+    if current_result > result:
+        return 0
+    elif inputs == []:
         return current_result == result
     else:
         if part2:
