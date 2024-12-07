@@ -17,7 +17,7 @@ def solve_part_1(file_name):
         for y, line in enumerate(file.readlines()):
             width = len(line.strip())
             height += 1
-            for x, item in enumerate(line):
+            for x, item in enumerate(line.strip()):
                 if item == '#':
                     map[y, x] = '#'
                 else:
@@ -29,7 +29,7 @@ def solve_part_1(file_name):
 
         part1_visited = set([item[0] for item in check_map(map, current_pos, width, height)])
         print(len(part1_visited))
-        
+        draw_map(map, width, height, part1_visited)
         for y in range(height):
             for x in range(width):
                 if map[y, x] == '.' and (y, x) != current_pos and (y,x) in part1_visited:
@@ -88,7 +88,7 @@ def draw_map(map, width, height, visited):
             elif map[y, x] == '#':
                 line += '#'
             else:
-                line += ' '
+                line += 'o'
         print(line)
     
 
