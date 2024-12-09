@@ -9,10 +9,7 @@ class Segment:
         return f'start {self.start}, len {self.len}, id {self.id}' 
     
     def checksum(self):
-        result = 0
-        for i in range(self.start, self.start+self.len):
-            result += self.id*i
-        return result
+        return sum ([self.id * i for i in range(self.start, self.start+self.len)])
 
 def solve_part_1(file_name):
     with open(file_name, 'r') as file:
@@ -52,8 +49,8 @@ def solve_part_2(file_name):
             mem_pointer += int(line[i*2 +1])
         segments.append(Segment(mem_pointer, line[-1], len(line)//2))
         i = len(segments)-1
-        for segment in segments:
-            print(segment)
+        #for segment in segments:
+            #print(segment)
         print('---')
         while i > 0:
             #print(segments[i])
@@ -61,7 +58,7 @@ def solve_part_2(file_name):
             #    segments.pop()
             #    i -= 1
             if segments[i].id != -1:
-                for j in range(i):
+                for j in range(i):  
                     if segments[j].id == -1 and segments[j].len >= segments[i].len and segments[i].moved == False :
                         segments[i].moved = True
                         segments[i].start = segments[j].start
@@ -75,8 +72,8 @@ def solve_part_2(file_name):
             i -= 1
         result = 0
         for segment in segments:
-            if segment.len != 0:
-                print(segment)
+            #if segment.len != 0:
+                #print(segment)
             if segment.id > -1:
                 result += segment.checksum()
         print(result)
