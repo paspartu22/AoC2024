@@ -79,8 +79,8 @@ def solve_part_2(file_name):
         print(result)
 
 def main():
-    #solve_part_1('test.txt')
-    #solve_part_1('data.txt')
+    solve_part_1('test.txt')
+    solve_part_1('data.txt')
     solve_part_2('test.txt')
     solve_part_2('data.txt')
 
