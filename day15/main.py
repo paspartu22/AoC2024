@@ -1,4 +1,5 @@
 
+        #LEFT   DOWN   RIGHT   UP
 dirs = [[-1,0], [0,1], [1,0], [0,-1]]
 dirs_map = {'^':3, '>':2, 'v':1, '<':0, '[':2, ']':0}
 
@@ -13,13 +14,25 @@ def draw_map(map, width, height):
             line += map[(x,y)]
         print(line)
         
-def solve_part_1(file_name):
+def calc_gps(map, width, height):
+    crates = ['O', '[']
+    result = 0
+    for y in range(height):
+        for x in range(width):
+            if map[(x,y)] in crates:
+                result += (100*y)+x
+    return result 
+
+def make_move(dir, obj, map):
+    new_obj = (obj[0] + dirs[dir][0], obj[1]+ dirs[dir][1])
+    map[new_obj] = map[tuple(obj)]
+    map[tuple(obj)] = '.'
+
+def solve_part_1(file_name, print_output = False):
     with open(file_name, 'r') as file:
         print(f'{file_name} part 1')
         maze, moves = file.read().split('\n\n')
         map = {}
-        walls = []
-        boxes = []
         robot = [0,0]
         width = 0
         height = 0
@@ -30,53 +43,29 @@ def solve_part_1(file_name):
                 map[(x,y)] = letter
                 if letter == '@':
                     robot = [x,y]
-                        
-        draw_map(map, width, height)
+        if print_output:
+            draw_map(map, width, height)
         for i,move in enumerate(moves):
-            #print(f'{i} {move}')
+            if print_output:
+                print(f'{i} {move}')
             if move in dirs_map:
-                if move_obj(dirs_map[move], robot, map, False):
+                move_list = list(move_obj(dirs_map[move], robot, map))
+                if 0 not in move_list:
                     robot = [robot[0]+dirs[dirs_map[move]][0], robot[1]+dirs[dirs_map[move]][1]]
-                #draw_map(map, width, height)
+                    while move_list:
+                        current_move = move_list.pop()
+                        if current_move != 1:
+                            make_move(dirs_map[move], current_move, map)     
+                    
+                if print_output:
+                    draw_map(map, width, height)
         print(calc_gps(map, width,  height))
-                        
-def calc_gps(map, width, height):
-    result = 0
-    for y in range(height):
-        for x in range(width):
-            if map[(x,y)] == 'O':
-                result += (100*y)+x
-    return result 
 
-def move_obj(dir, obj, map, is_box = True):
-    new_obj = (obj[0] + dirs[dir][0], obj[1]+ dirs[dir][1])
-    if map[new_obj] == '#':
-        return 0        
-    elif map[new_obj] == '.':
-        make_move(dir, obj, map)
-        return 1
-    elif map[new_obj] == 'O':
-        if (move_obj(dir, new_obj, map)):
-            make_move(dir, obj, map)
-            return 1
-        else:
-            return 0
-    return 0
-
-def make_move(dir, obj, map):
-    new_obj = (obj[0] + dirs[dir][0], obj[1]+ dirs[dir][1])
-    map[new_obj] = map[tuple(obj)]
-    map[tuple(obj)] = '.'
-                            
-
-        
 def solve_part_2(file_name, print_output = False):
     with open(file_name, 'r') as file:
         print(f'{file_name} part 2')
         maze, moves = file.read().split('\n\n')
         map = {}
-        walls = []
-        boxes = []
         robot = [0,0]
         width = 0
         height = 0
@@ -93,71 +82,56 @@ def solve_part_2(file_name, print_output = False):
                 if letter == '@':
                     robot = [x*2,y]
                     map[(x*2+1,y)] = '.'
-                        
-        draw_map(map, width, height)
-        #return 0
-        for i,move in enumerate(moves):
-            if i == 192:
-                pass
-            
-            if move in dirs_map:
-                move_result = list(move_obj_part_2(dirs_map[move], robot, map, False))
-                move_set = []
 
-                if 0 not in move_result:
-                    for j in range(len(move_result)):
-                        if move_result[-j-1] not in move_set and move_result[-j-1] != 1:
-                            move_set.append(move_result[-j-1])
+        for i,move in enumerate(moves):
+            if move in dirs_map:
+                move_list = list(move_obj(dirs_map[move], robot, map))
+                if 0 not in move_list:
+                    robot = [robot[0]+dirs[dirs_map[move]][0], robot[1]+dirs[dirs_map[move]][1]]
+                    move_set = []
+                    for j in range(len(move_list)):
+                        if move_list[-j-1] not in move_set and move_list[-j-1] != 1:
+                            move_set.append(move_list[-j-1])
+                            
                     while move_set:
                         current_move = move_set.pop(0)
-                        if map[current_move] != '.':
-                            make_move(dirs_map[move], current_move, map)        
-                            if i == 192:
-                                draw_map(map, width, height)
-                    robot = [robot[0]+dirs[dirs_map[move]][0], robot[1]+dirs[dirs_map[move]][1]]
+                        make_move(dirs_map[move], current_move, map)        
+
                 if print_output:
                     print(f'{i} {move}')
                     draw_map(map, width, height)
                     print('---')
-        print(calc_gps_2(map, width,  height))
+        
+        print(calc_gps(map, width,  height))
 
-def move_obj_part_2(dir, obj, map, is_box = True):
+def move_obj(dir, obj, map):
     obj = tuple(obj)
-    new_obj = (obj[0] + dirs[dir][0], obj[1]+ dirs[dir][1])
+    obj_next = (obj[0] + dirs[dir][0], obj[1]+ dirs[dir][1])
 
     if map[obj] == '#':
-        yield 0 
-    
+        yield 0     
+        
     elif map[obj] == '.':
         yield 1
         
-    elif map[obj] == '@':
+    elif map[obj] == '@' or map[obj] == 'O':
         yield obj
-        yield from move_obj_part_2(dir, new_obj, map)
+        yield from move_obj(dir, obj_next, map)
     
-    
-    else:
-        yield obj
+    else: ### part 2
         obj_pair = (obj[0] + dirs[dirs_map[map[obj]]][0], obj[1]+ dirs[dirs_map[map[obj]]][1])
+        yield obj
         yield obj_pair
-        new_obj_pair = (obj_pair[0] + dirs[dir][0], obj_pair[1]+ dirs[dir][1])
-        if dir%2 == 1:
-            yield from move_obj_part_2(dir, new_obj, map)
-        yield from move_obj_part_2(dir, new_obj_pair, map)
+        obj_pair_next = (obj_pair[0] + dirs[dir][0], obj_pair[1]+ dirs[dir][1])
+        if dir%2 == 1: ## if dir is vertical
+            yield from move_obj(dir, obj_next, map)
+        yield from move_obj(dir, obj_pair_next, map)
         
-        
-def calc_gps_2(map, width, height):
-    result = 0
-    for y in range(height):
-        for x in range(width):
-            if map[(x,y)] == '[':
-                result += (100*y)+x
-    return result 
 
 def main():
     #solve_part_1('test2.txt')
     #solve_part_1('test.txt')
-    #solve_part_1('data.txt')
+    solve_part_1('data.txt', False)
     #solve_part_2('test3.txt', True)
     #solve_part_2('test.txt', True)
     solve_part_2('data.txt', False)
