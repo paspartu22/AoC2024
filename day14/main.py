@@ -79,6 +79,7 @@ def solve_part_2(file_name, width, height, space):
             results_list.append(measure_map(robots))
         output.write(f'{results_list}')
         print(results_list)
+        print()
 
 def measure_map(robots):
     sx = 0
