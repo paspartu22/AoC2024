@@ -5,13 +5,9 @@ def solve_part_1(file_name):
         print(f'{file_name} part 1')
         edges = [line.split('-') for line in file.read().splitlines()]
         g = nx.from_edgelist(edges)
-
         cliques = nx.find_cliques(g)
-        result = []
-        for c in cliques:
-            if len(result) < len(c):
-                result = sorted(c)
-            print(c)
+        result =  sorted(max(cliques, key=len))
+
         line = ''
         for i in result:
             line += i +','            
