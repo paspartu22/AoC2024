@@ -1,36 +1,22 @@
-from collections import defaultdict
-from itertools import combinations
+import networkx as nx
 
 def solve_part_1(file_name):
     with open(file_name, 'r') as file:
         print(f'{file_name} part 1')
-        map = defaultdict(list)
-        for line in file.read().splitlines():
-            a,b = line.split('-')
-            map[a].append(b)
-            map[b].append(a)
-        for item in map.items():
-            print(item)
+        edges = [line.split('-') for line in file.read().splitlines()]
+        g = nx.from_edgelist(edges)
 
-        parties = set()
-        for user_1 in map.items():
-            for user_2 in user_1[1]:
-                for user_3 in map[user_2]:
-                    if user_1[0] in map[user_3]:
-                        parties.add(tuple(sorted((user_1[0], user_2, user_3))))
-        print(len(parties))
-        result = 0
-        for party in parties:
-            if any([True for p in party if p[0] == 't']):
-                result += 1
-        print(result)
-
-
-def solve_part_2(file_name):
-    with open(file_name, 'r') as file:
-        print(f'{file_name} part 2')
-
-
+        cliques = nx.find_cliques(g)
+        result = []
+        for c in cliques:
+            if len(result) < len(c):
+                result = sorted(c)
+            print(c)
+        line = ''
+        for i in result:
+            line += i +','            
+        print(line[:-1])
+        
 def main():
     solve_part_1('test.txt')
     solve_part_1('data.txt')
@@ -40,3 +26,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
